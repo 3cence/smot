@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.29)
 project(Smot)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 add_executable(${PROJECT_NAME} src/Smot.cpp)
