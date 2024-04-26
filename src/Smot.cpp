@@ -28,19 +28,40 @@ struct ProgramArgs {
   std::string path_to_screenshots;
 };
 
-void load_args(int argc, char **argv, ProgramArgs *args) {
-  // Do it
+int32_t load_args(int argc, char **argv, ProgramArgs *args) {
+  bool scrot_folder_provided = false;
+  args->verbose_mode = false;
+  for (int i = 1; i < argc; i++) {
+    std::string arg = std::string(argv[i]);
+    if (arg == "-v") {
+      args->verbose_mode = true;
+    } else if (arg[0] != '-') {
+      scrot_folder_provided = true;
+      args->path_to_screenshots = std::string(argv[i]);
+    } else {
+      std::cerr << "smot [options] folder_path" << std::endl;
+      std::cerr << "[options]" << std::endl;
+      std::cerr << "-v : verbose mode, for debugging" << std::endl;
+      return 1;
+    }
+  }
+  if (!scrot_folder_provided) {
+    args->path_to_screenshots = "~/Images/screenshots/";
+  }
+  return 0;
 }
 
 int main(int argc, char **argv) {
-  UNUSED(argc);
-  UNUSED(argv);
+  ProgramArgs args;
+  int32_t valid_args = load_args(argc, argv, &args);
+  if (valid_args != 0)
+    return 1;
 
   Display *display = XOpenDisplay("");
   if (display == NULL) {
     std::cerr << "Failed to open display" << std::endl;
     return 1;
-  } else {
+  } else if (args.verbose_mode) {
     std::cout << "Display opened successfully" << std::endl;
   }
 
@@ -86,13 +107,6 @@ int main(int argc, char **argv) {
     }
   }
 
-  std::cout << "Scrot Rectangle: " << std::endl;
-  std::cout << "[ " << scrot_rectangle.x1 << ", " << scrot_rectangle.y1 << " ]"
-            << std::endl;
-  std::cout << "[ " << scrot_rectangle.x2 - scrot_rectangle.x1 << ", "
-            << scrot_rectangle.y2 - scrot_rectangle.y1 << " ]" << std::endl;
-
-  std::string path_to_screenshots = "~/Images/screenshots/";
   std::string file_name_template = "%Y-%m-%d-%T-screenshot.png";
   std::string options =
       "-a " + std::to_string(scrot_rectangle.x1) + "," +
@@ -101,9 +115,17 @@ int main(int argc, char **argv) {
       std::to_string(scrot_rectangle.y2 - scrot_rectangle.y1) + " ";
 
   std::string command =
-      "scrot " + options + " " + path_to_screenshots + file_name_template;
+      "scrot " + options + " " + args.path_to_screenshots + file_name_template;
 
-  std::cout << command << std::endl;
+  if (args.verbose_mode) {
+    std::cout << "Scrot Rectangle: " << std::endl;
+    std::cout << "[ " << scrot_rectangle.x1 << ", " << scrot_rectangle.y1
+              << " ]" << std::endl;
+    std::cout << "[ " << scrot_rectangle.x2 - scrot_rectangle.x1 << ", "
+              << scrot_rectangle.y2 - scrot_rectangle.y1 << " ]" << std::endl;
+    std::cout << command << std::endl;
+  }
+
   system(command.c_str());
 
   XUngrabPointer(display, CurrentTime);
