@@ -3,8 +3,9 @@ project(Smot)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-add_executable(${PROJECT_NAME} src/Smot.cpp)
+add_executable(${PROJECT_NAME} src/Smot.cpp src/graphics.cpp)
 
+target_include_directories(${PROJECT_NAME} PRIVATE ./src/headers/)
 target_link_libraries(${PROJECT_NAME} X11)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror -g

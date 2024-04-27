@@ -1,3 +1,5 @@
+#include "headers/Smot.h"
+#include "headers/graphics.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <cstdint>
@@ -5,33 +7,6 @@
 #include <cstring>
 #include <iostream>
 #include <string>
-
-#define UNUSED(x) (void)(x)
-
-enum MouseEvent {
-  NoEvent = 0,
-  LeftMouseButton = 1,
-  MiddleMouseButton = 2,
-  RightMouseButton = 3,
-  BackMouseButton = 8,
-  FrontMouseButton = 9
-};
-
-struct ScrotRectangle {
-  int32_t points_set;
-  int32_t x1, y1;
-  int32_t x2, y2;
-};
-
-struct ProgramArgs {
-  bool verbose_mode;
-  std::string path_to_screenshots;
-};
-
-struct XEnvironment {
-  Display *display;
-  Window root_window;
-};
 
 int32_t load_args(int argc, char **argv, ProgramArgs *args) {
   bool scrot_folder_provided = false;
@@ -79,7 +54,7 @@ std::string build_scrot_command(ProgramArgs args,
   return command;
 }
 
-int32_t open_x_enviroment(XEnvironment *x_env, ProgramArgs args) {
+int32_t open_x_environment(XEnvironment *x_env, ProgramArgs args) {
   x_env->display = XOpenDisplay("");
   if (x_env->display == NULL) {
     std::cerr << "Failed to open display" << std::endl;
@@ -107,10 +82,11 @@ int main(int argc, char **argv) {
     return 1;
 
   XEnvironment x_env;
-  int32_t x_env_status = open_x_enviroment(&x_env, args);
+  int32_t x_env_status = open_x_environment(&x_env, args);
   if (x_env_status != 0) {
     return 1;
   }
+  int32_t graphics_status = init_graphics_context(x_env);
 
   bool select_mode_active = true;
   ScrotRectangle scrot_rectangle;
