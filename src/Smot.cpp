@@ -8,16 +8,16 @@
 #include <iostream>
 #include <string>
 
-int32_t load_args(int argc, char **argv, ProgramArgs *args) {
+int32_t load_args(int argc, char **argv, ProgramArgs &args) {
   bool scrot_folder_provided = false;
-  args->verbose_mode = false;
+  args.verbose_mode = false;
   for (int i = 1; i < argc; i++) {
     std::string arg = std::string(argv[i]);
     if (arg == "-v") {
-      args->verbose_mode = true;
+      args.verbose_mode = true;
     } else if (arg[0] != '-') {
       scrot_folder_provided = true;
-      args->path_to_screenshots = std::string(argv[i]);
+      args.path_to_screenshots = std::string(argv[i]);
     } else {
       std::cerr << "smot [options] folder_path" << std::endl;
       std::cerr << "[options]" << std::endl;
@@ -26,7 +26,7 @@ int32_t load_args(int argc, char **argv, ProgramArgs *args) {
     }
   }
   if (!scrot_folder_provided) {
-    args->path_to_screenshots = "~/Images/screenshots/";
+    args.path_to_screenshots = "~/Images/screenshots/";
   }
   return 0;
 }
@@ -54,7 +54,7 @@ std::string build_scrot_command(ProgramArgs args, XRectangle scrot_rectangle) {
 
 int main(int argc, char **argv) {
   ProgramArgs args;
-  int32_t valid_args = load_args(argc, argv, &args);
+  int32_t valid_args = load_args(argc, argv, args);
   if (valid_args != 0)
     return 1;
 
