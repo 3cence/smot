@@ -14,7 +14,7 @@ enum MouseEvent {
 };
 
 struct ProgramArgs {
-  bool verbose_mode;
+  bool verbose_mode, disable_visual;
   std::string path_to_screenshots;
 };
 

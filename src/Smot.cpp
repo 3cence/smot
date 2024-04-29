@@ -11,12 +11,19 @@
 int32_t load_args(int argc, char **argv, ProgramArgs &args) {
   bool scrot_folder_provided = false;
   args.verbose_mode = false;
+  args.disable_visual = false;
   for (int i = 1; i < argc; i++) {
     std::string arg = std::string(argv[i]);
     if (arg == "-v") {
       args.verbose_mode = true;
+    } else if (arg == "-n") {
+      args.disable_visual = true;
     } else if (arg[0] != '-') {
       scrot_folder_provided = true;
+      // this does not work. ill probably fix it at some point
+      // if (arg.end()[arg.length() - 1] != '/') {
+      //   args.path_to_screenshots = std::string(argv[i]) + "/";
+      // }
       args.path_to_screenshots = std::string(argv[i]);
     } else {
       std::cerr << "smot [options] folder_path" << std::endl;
@@ -130,12 +137,16 @@ int main(int argc, char **argv) {
           anchor.x = event.xbutton.x_root;
           anchor.y = event.xbutton.y_root;
           number_of_clicks++;
-          begin_area_selection(x_env, get_scrot_region(anchor, anchor));
+          if (!args.disable_visual) {
+            begin_area_selection(x_env, get_scrot_region(anchor, anchor));
+          }
         } else if (number_of_clicks == 1) {
           secondary.x = event.xbutton.x_root;
           secondary.y = event.xbutton.y_root;
           number_of_clicks++;
-          update_area_selection(x_env, get_scrot_region(anchor, secondary));
+          if (!args.disable_visual) {
+            update_area_selection(x_env, get_scrot_region(anchor, secondary));
+          }
           select_mode_active = false;
         }
         break;
@@ -147,7 +158,7 @@ int main(int argc, char **argv) {
         break;
       }
     } else if (event.type == MotionNotify) {
-      if (number_of_clicks == 1) {
+      if (number_of_clicks == 1 && !args.disable_visual) {
         secondary.x = event.xbutton.x_root;
         secondary.y = event.xbutton.y_root;
         update_area_selection(x_env, get_scrot_region(anchor, secondary));
