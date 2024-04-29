@@ -24,9 +24,4 @@ struct ProgramArgs {
   std::string path_to_screenshots;
 };
 
-struct XEnvironment {
-  Display *display;
-  Window root_window;
-};
-
 #endif
