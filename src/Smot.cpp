@@ -64,13 +64,25 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  int32_t grab_status =
+      XGrabPointer(x_env.display, x_env.root_window, False,
+                   ButtonReleaseMask | PointerMotionMask, GrabModeAsync,
+                   GrabModeAsync, None, None, CurrentTime);
+  if (grab_status != GrabSuccess) {
+    std::cerr << "Something went wrong while grabbing the pointer" << std::endl;
+    return 1;
+  }
+
   bool select_mode_active = true;
   XRectangle scrot_rectangle;
   memset(&scrot_rectangle, 0, sizeof(XRectangle));
+  scrot_rectangle.width = 15;
+  scrot_rectangle.height = 15;
 
   int32_t number_of_clicks = 0;
   while (select_mode_active) {
-    XSelectInput(x_env.display, x_env.root_window, ButtonReleaseMask);
+    XSelectInput(x_env.display, x_env.root_window,
+                 ButtonReleaseMask | PointerMotionMask);
     XEvent event;
     XNextEvent(x_env.display, &event);
 
@@ -81,12 +93,14 @@ int main(int argc, char **argv) {
           scrot_rectangle.x = event.xbutton.x_root;
           scrot_rectangle.y = event.xbutton.y_root;
           number_of_clicks++;
+          begin_area_selection(x_env, scrot_rectangle);
         } else if (number_of_clicks == 1) {
           scrot_rectangle.width = static_cast<unsigned short>(
               event.xbutton.x_root - scrot_rectangle.x);
           scrot_rectangle.height = static_cast<unsigned short>(
               event.xbutton.y_root - scrot_rectangle.y);
           number_of_clicks++;
+          update_area_selection(x_env, scrot_rectangle);
           select_mode_active = false;
         }
         break;
@@ -96,15 +110,20 @@ int main(int argc, char **argv) {
       default:
         break;
       }
+    } else if (event.type == MotionNotify) {
+      if (number_of_clicks == 1) {
+        scrot_rectangle.width = event.xmotion.x_root - scrot_rectangle.x;
+        scrot_rectangle.height = event.xmotion.y_root - scrot_rectangle.y;
+        update_area_selection(x_env, scrot_rectangle);
+      }
     }
-
-    XClearArea(x_env.display, x_env.root_window, 100, 100, 1000, 1000, false);
   }
 
   std::string command = build_scrot_command(args, scrot_rectangle);
   system(command.c_str());
 
   XUngrabPointer(x_env.display, CurrentTime);
-  XCloseDisplay(x_env.display);
+  close_x_environment(x_env);
+
   return 0;
 }
