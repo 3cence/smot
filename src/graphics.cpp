@@ -50,7 +50,6 @@ int32_t open_x_environment(XEnvironment &x_env, ProgramArgs args) {
   return 0;
 }
 
-// TODO: Use XSendEvent to send expose events to all windows
 void begin_area_selection(XEnvironment &x_env, XRectangle selection_area) {
   update_area_selection(x_env, selection_area);
   XMapRaised(x_env.display, x_env.display_window);

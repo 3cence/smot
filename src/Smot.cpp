@@ -52,6 +52,45 @@ std::string build_scrot_command(ProgramArgs args, XRectangle scrot_rectangle) {
   return command;
 }
 
+XRectangle get_scrot_region(XPoint anchor, XPoint secondary) {
+  if (anchor.x == secondary.x) {
+    secondary.x++;
+  }
+  if (anchor.y == secondary.y) {
+    secondary.y++;
+  }
+  XRectangle region;
+  // Quad 1
+  if (anchor.x < secondary.x && anchor.y > secondary.y) {
+    region.x = anchor.x;
+    region.y = secondary.y;
+    region.width = secondary.x - anchor.x;
+    region.height = anchor.y - secondary.y;
+  }
+  // Quad 2
+  else if (anchor.x > secondary.x && anchor.y > secondary.y) {
+    region.x = secondary.x;
+    region.y = secondary.y;
+    region.width = anchor.x - secondary.x;
+    region.height = anchor.y - secondary.y;
+  }
+  // Quad 3
+  else if (anchor.x > secondary.x && anchor.y < secondary.y) {
+    region.x = secondary.x;
+    region.y = anchor.y;
+    region.width = anchor.x - secondary.x;
+    region.height = secondary.y - anchor.y;
+  }
+  // Quad 4
+  else if (anchor.x < secondary.x && anchor.y < secondary.y) {
+    region.x = anchor.x;
+    region.y = anchor.y;
+    region.width = secondary.x - anchor.x;
+    region.height = secondary.y - anchor.y;
+  }
+  return region;
+}
+
 int main(int argc, char **argv) {
   ProgramArgs args;
   int32_t valid_args = load_args(argc, argv, args);
@@ -74,11 +113,9 @@ int main(int argc, char **argv) {
   }
 
   bool select_mode_active = true;
-  XRectangle scrot_rectangle;
-  memset(&scrot_rectangle, 0, sizeof(XRectangle));
-  scrot_rectangle.width = 15;
-  scrot_rectangle.height = 15;
-
+  bool canceled = false;
+  XPoint anchor = {0, 0};
+  XPoint secondary = {-1, -1};
   int32_t number_of_clicks = 0;
   while (select_mode_active) {
     XSelectInput(x_env.display, x_env.root_window,
@@ -90,37 +127,39 @@ int main(int argc, char **argv) {
       switch (event.xbutton.button) {
       case LeftMouseButton:
         if (number_of_clicks == 0) {
-          scrot_rectangle.x = event.xbutton.x_root;
-          scrot_rectangle.y = event.xbutton.y_root;
+          anchor.x = event.xbutton.x_root;
+          anchor.y = event.xbutton.y_root;
           number_of_clicks++;
-          begin_area_selection(x_env, scrot_rectangle);
+          begin_area_selection(x_env, get_scrot_region(anchor, anchor));
         } else if (number_of_clicks == 1) {
-          scrot_rectangle.width = static_cast<unsigned short>(
-              event.xbutton.x_root - scrot_rectangle.x);
-          scrot_rectangle.height = static_cast<unsigned short>(
-              event.xbutton.y_root - scrot_rectangle.y);
+          secondary.x = event.xbutton.x_root;
+          secondary.y = event.xbutton.y_root;
           number_of_clicks++;
-          update_area_selection(x_env, scrot_rectangle);
+          update_area_selection(x_env, get_scrot_region(anchor, secondary));
           select_mode_active = false;
         }
         break;
       case RightMouseButton:
         select_mode_active = false;
+        canceled = true;
         break;
       default:
         break;
       }
     } else if (event.type == MotionNotify) {
       if (number_of_clicks == 1) {
-        scrot_rectangle.width = event.xmotion.x_root - scrot_rectangle.x;
-        scrot_rectangle.height = event.xmotion.y_root - scrot_rectangle.y;
-        update_area_selection(x_env, scrot_rectangle);
+        secondary.x = event.xbutton.x_root;
+        secondary.y = event.xbutton.y_root;
+        update_area_selection(x_env, get_scrot_region(anchor, secondary));
       }
     }
   }
 
-  std::string command = build_scrot_command(args, scrot_rectangle);
-  system(command.c_str());
+  if (!canceled) {
+    std::string command =
+        build_scrot_command(args, get_scrot_region(anchor, secondary));
+    system(command.c_str());
+  }
 
   XUngrabPointer(x_env.display, CurrentTime);
   close_x_environment(x_env);
