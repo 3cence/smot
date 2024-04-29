@@ -8,6 +8,6 @@ struct XEnvironment {
   Window root_window;
 };
 
-int32_t open_x_environment(XEnvironment *, ProgramArgs);
+int32_t open_x_environment(XEnvironment &, ProgramArgs);
 
 #endif

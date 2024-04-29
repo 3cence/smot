@@ -13,12 +13,6 @@ enum MouseEvent {
   FrontMouseButton = 9
 };
 
-struct ScrotRectangle {
-  int32_t points_set;
-  int32_t x1, y1;
-  int32_t x2, y2;
-};
-
 struct ProgramArgs {
   bool verbose_mode;
   std::string path_to_screenshots;

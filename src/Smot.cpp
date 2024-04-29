@@ -31,24 +31,22 @@ int32_t load_args(int argc, char **argv, ProgramArgs *args) {
   return 0;
 }
 
-std::string build_scrot_command(ProgramArgs args,
-                                ScrotRectangle scrot_rectangle) {
+std::string build_scrot_command(ProgramArgs args, XRectangle scrot_rectangle) {
   std::string file_name_template = "%Y-%m-%d-%T-screenshot.png";
-  std::string options =
-      "-a " + std::to_string(scrot_rectangle.x1) + "," +
-      std::to_string(scrot_rectangle.y1) + "," +
-      std::to_string(scrot_rectangle.x2 - scrot_rectangle.x1) + "," +
-      std::to_string(scrot_rectangle.y2 - scrot_rectangle.y1) + " ";
+  std::string options = "-a " + std::to_string(scrot_rectangle.x) + "," +
+                        std::to_string(scrot_rectangle.y) + "," +
+                        std::to_string(scrot_rectangle.width) + "," +
+                        std::to_string(scrot_rectangle.height) + " ";
 
   std::string command =
       "scrot " + options + " " + args.path_to_screenshots + file_name_template;
 
   if (args.verbose_mode) {
     std::cout << "Scrot Rectangle: " << std::endl;
-    std::cout << "[ " << scrot_rectangle.x1 << ", " << scrot_rectangle.y1
+    std::cout << "[ " << scrot_rectangle.x << ", " << scrot_rectangle.y << " ]"
+              << std::endl;
+    std::cout << "[ " << scrot_rectangle.width << ", " << scrot_rectangle.height
               << " ]" << std::endl;
-    std::cout << "[ " << scrot_rectangle.x2 - scrot_rectangle.x1 << ", "
-              << scrot_rectangle.y2 - scrot_rectangle.y1 << " ]" << std::endl;
     std::cout << command << std::endl;
   }
   return command;
@@ -61,15 +59,16 @@ int main(int argc, char **argv) {
     return 1;
 
   XEnvironment x_env;
-  int32_t x_env_status = open_x_environment(&x_env, args);
+  int32_t x_env_status = open_x_environment(x_env, args);
   if (x_env_status != 0) {
     return 1;
   }
 
   bool select_mode_active = true;
-  ScrotRectangle scrot_rectangle;
-  memset(&scrot_rectangle, 0, sizeof(ScrotRectangle));
+  XRectangle scrot_rectangle;
+  memset(&scrot_rectangle, 0, sizeof(XRectangle));
 
+  int32_t number_of_clicks = 0;
   while (select_mode_active) {
     XSelectInput(x_env.display, x_env.root_window, ButtonReleaseMask);
     XEvent event;
@@ -78,14 +77,16 @@ int main(int argc, char **argv) {
     if (event.type == ButtonRelease) {
       switch (event.xbutton.button) {
       case LeftMouseButton:
-        if (scrot_rectangle.points_set == 0) {
-          scrot_rectangle.x1 = event.xbutton.x_root;
-          scrot_rectangle.y1 = event.xbutton.y_root;
-          scrot_rectangle.points_set = 1;
-        } else if (scrot_rectangle.points_set == 1) {
-          scrot_rectangle.x2 = event.xbutton.x_root;
-          scrot_rectangle.y2 = event.xbutton.y_root;
-          scrot_rectangle.points_set = 2;
+        if (number_of_clicks == 0) {
+          scrot_rectangle.x = event.xbutton.x_root;
+          scrot_rectangle.y = event.xbutton.y_root;
+          number_of_clicks++;
+        } else if (number_of_clicks == 1) {
+          scrot_rectangle.width = static_cast<unsigned short>(
+              event.xbutton.x_root - scrot_rectangle.x);
+          scrot_rectangle.height = static_cast<unsigned short>(
+              event.xbutton.y_root - scrot_rectangle.y);
+          number_of_clicks++;
           select_mode_active = false;
         }
         break;
