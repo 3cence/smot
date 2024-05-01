@@ -2,11 +2,19 @@ cmake_minimum_required(VERSION 3.29)
 project(Smot)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(${PROJECT_NAME} src/Smot.cpp src/graphics.cpp)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ./src/headers/)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Werror -g -Wno-error=unused-variable -Wno-error=unused-parameter")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+
+add_executable(${PROJECT_NAME} src/Smot.cpp src/Graphics.cpp)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ./headers/)
 target_link_libraries(${PROJECT_NAME} X11)
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror -g
-  -Wno-error=unused-variable -Wno-error=unused-parameter)
+# target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror -g
+#   -Wno-error=unused-variable -Wno-error=unused-parameter)
