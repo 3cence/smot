@@ -1,6 +1,7 @@
 # SMOT
 
-Compile and Run on an X11 system, and select and area to screenshot.
+Compile and Run on an X11 system, and select and area to screenshot. This was built for my installation
+of arch linux, and I have not tested this on any system other than my own, so, you have been warned.
 
 ## Dependencies
 
