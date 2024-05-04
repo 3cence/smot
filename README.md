@@ -5,7 +5,7 @@ of arch linux, and I have not tested this on any system other than my own, so, y
 
 ## Dependencies
 
-`X11`, `Imlib2`, and a composer (if you dont have one, use the option -n for no visual feedback)
+`X11`, `Imlib2`, and a compositor (if you dont have one, use the option -n for no visual feedback)
 
 ## Usage
 
