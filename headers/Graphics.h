@@ -5,9 +5,9 @@
 #include <cstdint>
 
 struct XEnvironment {
-  Display *display;
-  Window root_window;
-  Window display_window;
+   Display *display;
+   Window root_window;
+   Window display_window;
 };
 
 int32_t open_x_environment(XEnvironment &, ProgramArgs);

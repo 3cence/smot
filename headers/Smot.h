@@ -5,17 +5,17 @@
 #include <string>
 
 enum MouseEvent {
-  NoEvent = 0,
-  LeftMouseButton = 1,
-  MiddleMouseButton = 2,
-  RightMouseButton = 3,
-  BackMouseButton = 8,
-  FrontMouseButton = 9
+   NoEvent = 0,
+   LeftMouseButton = 1,
+   MiddleMouseButton = 2,
+   RightMouseButton = 3,
+   BackMouseButton = 8,
+   FrontMouseButton = 9
 };
 
 struct ProgramArgs {
-  bool verbose_mode, disable_visual;
-  std::string path_to_screenshots;
+   bool verbose_mode, disable_visual;
+   std::string path_to_screenshots;
 };
 
 #endif
