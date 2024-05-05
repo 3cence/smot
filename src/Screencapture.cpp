@@ -12,10 +12,11 @@
 #include <stdexcept>
 #include <string>
 
-std::string exec(const char *cmd) {
+std::string exec(std::string cmd) {
    std::array<char, 128> buffer;
    std::string result;
-   std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+   std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"),
+                                                 pclose);
    if (!pipe) {
       throw std::runtime_error("popen() failed!");
    }
@@ -36,14 +37,20 @@ std::string prepare_file_path(ProgramArgs args) {
    result.replace(result.length() - 1, 1, "");
    std::replace(result.begin(), result.end(), ' ', '-');
 
-   final_path += "screenshot-" + result + ".png";
+   final_path += "screenshot-" + result;
+
+   while (exec("file " + final_path + ".png")
+              .find("(No such file or directory)") == std::string::npos) {
+      final_path += "_1";
+   }
+
+   final_path += +".png";
 
    return final_path;
 }
 
 void take_and_save_screenshot(XEnvironment &x_env, ProgramArgs args,
                               XRectangle capture_area) {
-   // Initalize imlib. This should be moved to open_x_environment()
    int scr = XDefaultScreen(x_env.display);
    Visual *vis = DefaultVisual(x_env.display, scr);
    Colormap cm = DefaultColormap(x_env.display, scr);
@@ -62,11 +69,16 @@ void take_and_save_screenshot(XEnvironment &x_env, ProgramArgs args,
    imlib_context_set_image(screenshot);
 
    std::string filename = prepare_file_path(args);
-   // std::string filename = "screenshot.png";
-   std::cout << filename << std::endl;
+
+   if (args.verbose_mode) {
+      std::cout << filename << std::endl;
+   }
+
    Imlib_Load_Error imErr;
    imlib_save_image_with_error_return(filename.c_str(), &imErr);
    if (imErr) {
       std::cout << "Oh no! Unable to save Screenshot" << std::endl;
    }
+
+   imlib_free_image_and_decache();
 }
