@@ -5,13 +5,15 @@
 #include <string>
 
 enum MouseEvent {
-   NoEvent = 0,
-   LeftMouseButton = 1,
-   MiddleMouseButton = 2,
-   RightMouseButton = 3,
-   BackMouseButton = 8,
-   FrontMouseButton = 9
+   ME_NoEvent = 0,
+   ME_LeftMouseButton = 1,
+   ME_MiddleMouseButton = 2,
+   ME_RightMouseButton = 3,
+   ME_BackMouseButton = 8,
+   ME_FrontMouseButton = 9
 };
+
+enum CaptureMode { CM_Screenshot, CM_Video };
 
 struct ProgramArgs {
    bool verbose_mode, disable_visual;

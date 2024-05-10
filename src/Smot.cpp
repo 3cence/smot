@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
 
       if (event.type == ButtonRelease) {
          switch (event.xbutton.button) {
-         case LeftMouseButton:
+         case ME_LeftMouseButton:
             if (number_of_clicks == 0) {
                anchor.x = event.xbutton.x_root;
                anchor.y = event.xbutton.y_root;
@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
                select_mode_active = false;
             }
             break;
-         case RightMouseButton:
+         case ME_RightMouseButton:
             select_mode_active = false;
             canceled = true;
             break;
