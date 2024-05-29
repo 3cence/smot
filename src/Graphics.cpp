@@ -7,12 +7,12 @@
 
 #define SCROT_BORDER_WIDTH 5
 
-int32_t open_x_environment(XEnvironment &x_env, ProgramArgs args) {
+int32_t open_x_environment(XEnvironment &x_env) {
    x_env.display = XOpenDisplay(NULL);
    if (x_env.display == NULL) {
       std::cerr << "Failed to open display" << std::endl;
       return 1;
-   } else if (args.verbose_mode) {
+   } else if (smot::args.verbose_mode) {
       std::cout << "Display opened successfully" << std::endl;
    }
 

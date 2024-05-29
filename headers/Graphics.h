@@ -10,7 +10,7 @@ struct XEnvironment {
    Window display_window;
 };
 
-int32_t open_x_environment(XEnvironment &, ProgramArgs);
+int32_t open_x_environment(XEnvironment &);
 void close_x_environment(XEnvironment &);
 
 void begin_area_selection(XEnvironment &, XRectangle);

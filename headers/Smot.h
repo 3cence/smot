@@ -20,4 +20,8 @@ struct ProgramArgs {
    std::string path_to_screenshots;
 };
 
+namespace smot {
+extern ProgramArgs args;
+}
+
 #endif
