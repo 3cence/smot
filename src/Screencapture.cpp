@@ -63,15 +63,14 @@ void initalize_imlib_for_screenshot(XEnvironment &x_env) {
    imlib_set_cache_size(0);
 }
 
-Imlib_Image take_screenshot(XEnvironment &x_env, XRectangle capture_area) {
+Imlib_Image take_screenshot(XRectangle capture_area) {
    Imlib_Image screenshot = imlib_create_image_from_drawable(
        0, capture_area.x, capture_area.y, capture_area.width,
        capture_area.height, 1);
    return screenshot;
 }
 
-int32_t save_screenshot(XEnvironment &x_env, XRectangle capture_area,
-                        Imlib_Image screenshot) {
+int32_t save_screenshot(Imlib_Image screenshot) {
    imlib_context_set_image(screenshot);
    std::string filename = prepare_file_path();
 

@@ -89,8 +89,8 @@ int main(int argc, char **argv) {
    if (!canceled) {
       initalize_imlib_for_screenshot(x_env);
       XRectangle region = get_scrot_region(anchor, secondary);
-      Imlib_Image screenshot = take_screenshot(x_env, region);
-      save_screenshot(x_env, region, screenshot);
+      Imlib_Image screenshot = take_screenshot(region);
+      save_screenshot(screenshot);
    }
 
    close_x_environment(x_env);

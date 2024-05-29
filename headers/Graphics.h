@@ -1,6 +1,5 @@
 #ifndef GRAPHICS_HEADER
 #define GRAPHICS_HEADER
-#include "Smot.h"
 #include <X11/Xlib.h>
 #include <cstdint>
 
