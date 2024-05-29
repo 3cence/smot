@@ -50,14 +50,14 @@ std::string prepare_file_path() {
 }
 
 void initalize_imlib_for_screenshot(XEnvironment &x_env) {
-   int scr = XDefaultScreen(x_env.display);
-   Visual *vis = DefaultVisual(x_env.display, scr);
-   Colormap cm = DefaultColormap(x_env.display, scr);
+   int default_screen = XDefaultScreen(x_env.display);
+   Visual *default_visual = DefaultVisual(x_env.display, default_screen);
+   Colormap default_colormap = DefaultColormap(x_env.display, default_screen);
 
    imlib_context_set_drawable(x_env.root_window);
    imlib_context_set_display(x_env.display);
-   imlib_context_set_visual(vis);
-   imlib_context_set_colormap(cm);
+   imlib_context_set_visual(default_visual);
+   imlib_context_set_colormap(default_colormap);
    imlib_context_set_color_modifier(NULL);
    imlib_context_set_operation(IMLIB_OP_COPY);
    imlib_set_cache_size(0);

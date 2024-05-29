@@ -37,8 +37,8 @@ int main(int argc, char **argv) {
 
    bool select_mode_active = true;
    bool canceled = false;
-   XPoint anchor = {0, 0};
-   XPoint secondary = {-1, -1};
+   XPoint anchor_point = {0, 0};
+   XPoint secondary_point = {-1, -1};
    int32_t number_of_clicks = 0;
 
    while (select_mode_active) {
@@ -51,19 +51,20 @@ int main(int argc, char **argv) {
          switch (event.xbutton.button) {
          case ME_LeftMouseButton:
             if (number_of_clicks == 0) {
-               anchor.x = event.xbutton.x_root;
-               anchor.y = event.xbutton.y_root;
+               anchor_point.x = event.xbutton.x_root;
+               anchor_point.y = event.xbutton.y_root;
                number_of_clicks++;
                if (!smot::args.disable_visual) {
-                  begin_area_selection(x_env, get_scrot_region(anchor, anchor));
+                  begin_area_selection(
+                      x_env, get_scrot_region(anchor_point, anchor_point));
                }
             } else if (number_of_clicks == 1) {
-               secondary.x = event.xbutton.x_root;
-               secondary.y = event.xbutton.y_root;
+               secondary_point.x = event.xbutton.x_root;
+               secondary_point.y = event.xbutton.y_root;
                number_of_clicks++;
                if (!smot::args.disable_visual) {
-                  update_area_selection(x_env,
-                                        get_scrot_region(anchor, secondary));
+                  update_area_selection(
+                      x_env, get_scrot_region(anchor_point, secondary_point));
                }
                select_mode_active = false;
             }
@@ -77,9 +78,10 @@ int main(int argc, char **argv) {
          }
       } else if (event.type == MotionNotify) {
          if (number_of_clicks == 1 && !smot::args.disable_visual) {
-            secondary.x = event.xbutton.x_root;
-            secondary.y = event.xbutton.y_root;
-            update_area_selection(x_env, get_scrot_region(anchor, secondary));
+            secondary_point.x = event.xbutton.x_root;
+            secondary_point.y = event.xbutton.y_root;
+            update_area_selection(
+                x_env, get_scrot_region(anchor_point, secondary_point));
          }
       }
    }
@@ -88,7 +90,7 @@ int main(int argc, char **argv) {
 
    if (!canceled) {
       initalize_imlib_for_screenshot(x_env);
-      XRectangle region = get_scrot_region(anchor, secondary);
+      XRectangle region = get_scrot_region(anchor_point, secondary_point);
       Imlib_Image screenshot = take_screenshot(region);
       save_screenshot(screenshot);
    }
@@ -128,41 +130,45 @@ int32_t load_args(int argc, char **argv) {
    return 0;
 }
 
-XRectangle get_scrot_region(XPoint anchor, XPoint secondary) {
-   if (anchor.x == secondary.x) {
-      secondary.x++;
+XRectangle get_scrot_region(XPoint anchor_point, XPoint secondary_point) {
+   if (anchor_point.x == secondary_point.x) {
+      secondary_point.x++;
    }
-   if (anchor.y == secondary.y) {
-      secondary.y++;
+   if (anchor_point.y == secondary_point.y) {
+      secondary_point.y++;
    }
    XRectangle region;
    // Quad 1
-   if (anchor.x < secondary.x && anchor.y > secondary.y) {
-      region.x = anchor.x;
-      region.y = secondary.y;
-      region.width = secondary.x - anchor.x;
-      region.height = anchor.y - secondary.y;
+   if (anchor_point.x < secondary_point.x &&
+       anchor_point.y > secondary_point.y) {
+      region.x = anchor_point.x;
+      region.y = secondary_point.y;
+      region.width = secondary_point.x - anchor_point.x;
+      region.height = anchor_point.y - secondary_point.y;
    }
    // Quad 2
-   else if (anchor.x > secondary.x && anchor.y > secondary.y) {
-      region.x = secondary.x;
-      region.y = secondary.y;
-      region.width = anchor.x - secondary.x;
-      region.height = anchor.y - secondary.y;
+   else if (anchor_point.x > secondary_point.x &&
+            anchor_point.y > secondary_point.y) {
+      region.x = secondary_point.x;
+      region.y = secondary_point.y;
+      region.width = anchor_point.x - secondary_point.x;
+      region.height = anchor_point.y - secondary_point.y;
    }
    // Quad 3
-   else if (anchor.x > secondary.x && anchor.y < secondary.y) {
-      region.x = secondary.x;
-      region.y = anchor.y;
-      region.width = anchor.x - secondary.x;
-      region.height = secondary.y - anchor.y;
+   else if (anchor_point.x > secondary_point.x &&
+            anchor_point.y < secondary_point.y) {
+      region.x = secondary_point.x;
+      region.y = anchor_point.y;
+      region.width = anchor_point.x - secondary_point.x;
+      region.height = secondary_point.y - anchor_point.y;
    }
    // Quad 4
-   else if (anchor.x < secondary.x && anchor.y < secondary.y) {
-      region.x = anchor.x;
-      region.y = anchor.y;
-      region.width = secondary.x - anchor.x;
-      region.height = secondary.y - anchor.y;
+   else if (anchor_point.x < secondary_point.x &&
+            anchor_point.y < secondary_point.y) {
+      region.x = anchor_point.x;
+      region.y = anchor_point.y;
+      region.width = secondary_point.x - anchor_point.x;
+      region.height = secondary_point.y - anchor_point.y;
    }
    return region;
 }

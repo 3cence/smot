@@ -22,9 +22,9 @@ int32_t open_x_environment(XEnvironment &x_env) {
    // Set window attributes
    // Will need to experiement: but may need to disable mouse event
    // propigation
-   XVisualInfo vinfo;
+   XVisualInfo visual_info;
    XMatchVisualInfo(x_env.display, DefaultScreen(x_env.display), 32, TrueColor,
-                    &vinfo);
+                    &visual_info);
 
    unsigned long attribute_mask = 0;
    XSetWindowAttributes attributes;
@@ -32,7 +32,7 @@ int32_t open_x_environment(XEnvironment &x_env) {
    attribute_mask |= CWColormap;
    attributes.colormap =
        XCreateColormap(x_env.display, DefaultRootWindow(x_env.display),
-                       vinfo.visual, AllocNone);
+                       visual_info.visual, AllocNone);
    attribute_mask |= CWOverrideRedirect;
    attributes.override_redirect = True;
    attribute_mask |= CWBorderPixel;
@@ -42,9 +42,10 @@ int32_t open_x_environment(XEnvironment &x_env) {
    attribute_mask |= CWSaveUnder;
    attributes.save_under = True;
 
-   x_env.display_window = XCreateWindow(
-       x_env.display, x_env.root_window, 0, 0, 100, 100, SCROT_BORDER_WIDTH,
-       vinfo.depth, InputOutput, vinfo.visual, attribute_mask, &attributes);
+   x_env.display_window =
+       XCreateWindow(x_env.display, x_env.root_window, 0, 0, 100, 100,
+                     SCROT_BORDER_WIDTH, visual_info.depth, InputOutput,
+                     visual_info.visual, attribute_mask, &attributes);
 
    // Map window to the screen -- for testing
    // XMapRaised(x_env.display, x_env.display_window);
