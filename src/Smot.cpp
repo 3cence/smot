@@ -104,12 +104,15 @@ int32_t load_args(int argc, char **argv) {
    bool scrot_folder_provided = false;
    smot::args.verbose_mode = false;
    smot::args.disable_visual = false;
+   smot::args.video_mode = false;
    for (int i = 1; i < argc; i++) {
       std::string arg = std::string(argv[i]);
       if (arg == "-v") {
          smot::args.verbose_mode = true;
       } else if (arg == "-n") {
          smot::args.disable_visual = true;
+      } else if (arg == "-r") {
+         smot::args.video_mode = true;
       } else if (arg[0] != '-') {
          scrot_folder_provided = true;
          // this does not work. ill probably fix it at some point

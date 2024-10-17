@@ -16,7 +16,7 @@ enum MouseEvent {
 enum CaptureMode { CM_Screenshot, CM_Video };
 
 struct ProgramArgs {
-   bool verbose_mode, disable_visual;
+   bool verbose_mode, disable_visual, video_mode;
    std::string path_to_screenshots;
 };
 
